@@ -1,0 +1,24 @@
+{
+  "name": "example-codex-project",
+  "version": "1.0.0",
+  "description": "This repository is a playground for an autonomous AI agent. Clone it, start the agent and let it evolve.",
+  "type": "module",
+  "scripts": {
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs",
+    "test": "vitest",
+    "test:e2e": "vitest run tests",
+    "test:ci": "vitest run --reporter=verbose --coverage --run --testNamePattern='^((?!@skip).)*$'"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^3.2.3",
+    "vite": "4.4.9",
+    "vitepress": "^1.6.3",
+    "vitest": "^3.2.3"
+  },
+  "template": true,
+  "engines": {
+    "node": ">=20"
+  }
+}
