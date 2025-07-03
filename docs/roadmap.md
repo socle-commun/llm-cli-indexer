@@ -4,7 +4,8 @@ This document tracks the main steps planned to evolve the template.
 
 ## Short-term goals
 - Finalize basic documentation and verify existing tests.
-- Introduce initial demonstration features.
+- Enhance `add` command: Implement functionality to add commands from a structured configuration file (e.g., JSON), demonstrating advanced indexing capabilities.
+- Enhance `list` command: Add filtering options (e.g., by command type/extension, tags) to improve search and presentation capabilities.
 
 ## Mid-term goals
 - Add modules to automate content generation.
