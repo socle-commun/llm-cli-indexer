@@ -23,6 +23,19 @@ All development will strictly adhere to a "DOC FIRST" philosophy. This means:
     c.  **Implement Features:** Write the necessary code to make the newly written tests pass.
     d.  **Comment Code Intelligibly:** Ensure all code is clearly and concisely commented, explaining *why* a piece of code exists or *how* complex logic works, rather than simply *what* it does.
 
+### Testing by Feature
+
+To facilitate focused development and debugging, tests can be executed for specific features. This allows for rapid iteration on a single command or functionality without running the entire test suite.
+
+**Steps:**
+1.  **Identify the Test File**: Locate the test file corresponding to the feature you are working on (e.g., `tests/commands/init.test.js` for the `init` command).
+2.  **Run Targeted Tests**: Use the Vitest CLI to execute only that specific test file:
+    ```bash
+    vitest <path/to/your/test/file.test.js>
+    ```
+    For example: `vitest tests/commands/init.test.js`
+3.  **Iterate and Debug**: Work on the feature and its tests, running only the relevant tests until they pass.
+
 ## Key Documentation
 -   [Creating New CLI Commands](./docs/commands.md)
 -   [Refactoring Roadmap](./docs/refactoring-roadmap.md)
