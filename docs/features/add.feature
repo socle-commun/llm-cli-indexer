@@ -43,9 +43,16 @@ Feature: Add CLI Command
   Scenario: Add a command with a custom description
     Given the llm-cli index is initialized locally
     And a script "./path/to/custom-desc-script.sh" exists and responds to "--help" with "This is the help description."
-    When I run "llm-cli add ./path/to/custom-desc-script.sh --name custom-desc --description "My custom description."
+    When I run "llm-cli add ./path/to/custom-desc-script.sh --name custom-desc -d "My custom description."
     Then the command "custom-desc" should be added to the local index
     And its description should be "My custom description."
+
+  Scenario: Add a command with an install command
+    Given the llm-cli index is initialized locally
+    And a script "./path/to/installable-script.sh" exists and responds to "--help" with "This script can be installed."
+    When I run "llm-cli add ./path/to/installable-script.sh --name installable-script --install "npm install -g installable-script-cli"
+    Then the command "installable-script" should be added to the local index
+    And its install command should be "npm install -g installable-script-cli"
 
   Scenario: Attempt to add a command with a duplicate name
     Given the llm-cli index is initialized locally
