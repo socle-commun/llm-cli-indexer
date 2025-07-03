@@ -1,18 +1,9 @@
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
+import fs from 'fs';
+import path from 'path';
+import os from 'os';
+import { getIndexPath, readIndex, writeIndex } from '../../utils/index.js';
 
-function getIndexPath(isGlobal) {
-  const base = isGlobal ? os.homedir() : process.cwd();
-  return path.join(base, '.llm-cli', 'index.json');
-}
-
-function readIndex(indexPath) {
-  if (!fs.existsSync(indexPath)) return [];
-  return JSON.parse(fs.readFileSync(indexPath, 'utf8'));
-}
-
-module.exports = (program) => {
+export const command = (program) => {
   program.command('list')
     .description('List commands in the llm-cli index')
     .option('-g, --global', 'Use global index')

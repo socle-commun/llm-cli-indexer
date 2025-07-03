@@ -4,6 +4,9 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 
+// Import the initAction function directly
+const { initAction } = require('../../../src/commands/init/index.js');
+
 describe('llm-cli add command', () => {
   const localLlmCliDir = path.join(process.cwd(), '.llm-cli');
   const localIndexPath = path.join(localLlmCliDir, 'index.json');
@@ -30,12 +33,13 @@ describe('llm-cli add command', () => {
     console.log('--- Cleanup complete ---');
   };
 
-  // Helper to initialize index
+  // Helper to initialize index using the imported initAction
   const initIndex = (isGlobal = false) => {
     const targetDir = isGlobal ? globalLlmCliDir : localLlmCliDir;
     const targetPath = isGlobal ? globalIndexPath : localIndexPath;
     console.log(`Initializing index: isGlobal=${isGlobal}, targetDir=${targetDir}, targetPath=${targetPath}`);
-    execSync(`node src/index.js init${isGlobal ? ' --global' : ''}`);
+    // Call the initAction directly
+    initAction({ global: isGlobal });
     console.log(`Index initialized. Exists: ${fs.existsSync(targetPath)}`);
   };
 
@@ -117,6 +121,20 @@ describe('llm-cli add command', () => {
     const indexContent = JSON.parse(fs.readFileSync(localIndexPath, 'utf8'));
     expect(indexContent[0].name).toBe('custom-desc');
     expect(indexContent[0].description).toBe('My custom description.');
+  });
+
+  // Scenario: Add a command with an install command
+  test('should add a command with an install command', () => {
+    initIndex();
+    const scriptPath = createDummyScript('installable-script.js', 'console.log("This script can be installed.");');
+    const installCmd = 'npm install -g installable-script-cli';
+    console.log(`Executing: node src/index.js add ${scriptPath} --name installable-script --install "${installCmd}"`);
+    execSync(`node src/index.js add ${scriptPath} --name installable-script --install "${installCmd}"`);
+
+    const indexContent = JSON.parse(fs.readFileSync(localIndexPath, 'utf8'));
+    expect(indexContent.length).toBe(1);
+    expect(indexContent[0].name).toBe('installable-script');
+    expect(indexContent[0].installCommand).toBe(installCmd);
   });
 
   // Scenario: Attempt to add a command that does not respond to --help

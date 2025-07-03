@@ -1,34 +1,26 @@
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
-const { execSync } = require('child_process');
+import fs from 'fs';
+import path from 'path';
+import os from 'os';
+import { execSync } from 'child_process';
+import { getIndexPath, readIndex, writeIndex } from '../../utils/index.js';
 
-const LLM_CLI_DIR = '.llm-cli';
-const INDEX_FILE = 'index.json';
+function getCommandDescription(commandPath, llmHelpSource) {
+  let commandToExecute = `${commandPath} ${llmHelpSource}`;
+  if (commandPath.endsWith('.js')) {
+    commandToExecute = `node ${commandPath} ${llmHelpSource}`;
+  }
 
-function getIndexPath(isGlobal) {
-  if (isGlobal) {
-    return path.join(os.homedir(), LLM_CLI_DIR, INDEX_FILE);
-  } else {
-    return path.join(process.cwd(), LLM_CLI_DIR, INDEX_FILE);
+  try {
+    const output = execSync(commandToExecute, { encoding: 'utf8', stdio: 'pipe' });
+    const lines = output.split(/\r?\n/).map(line => line.trim()).filter(line => line.length > 0);
+    return lines.length > 0 ? lines[0] : '';
+  } catch (error) {
+    console.error(`Error executing '${commandToExecute}': ${error.message}`);
+    throw new Error(`Command '${path.basename(commandPath)}' did not respond to ${llmHelpSource} or returned an error.`);
   }
 }
 
-function readIndex(indexPath) {
-  if (!fs.existsSync(indexPath)) {
-    return [];
-  }
-  const content = fs.readFileSync(indexPath, 'utf8');
-  return JSON.parse(content);
-}
-
-function writeIndex(indexPath, data) {
-  fs.writeFileSync(indexPath, JSON.stringify(data, null, 2));
-}
-
-function getCommandDescription(commandPath, llmHelpSource) {  let commandToExecute = `${commandPath} ${llmHelpSource}`;  if (commandPath.endsWith('.js')) {    commandToExecute = `node ${commandPath} ${llmHelpSource}`;  }  try {    const output = execSync(commandToExecute, { encoding: 'utf8', stdio: 'pipe' });    const lines = output.split(/\r?\n/).map(line => line.trim()).filter(line => line.length > 0);    return lines.length > 0 ? lines[0] : '';  } catch (error) {    console.error(`Error executing '${commandToExecute}': ${error.message}`);    throw new Error(`Command '${path.basename(commandPath)}' did not respond to ${llmHelpSource} or returned an error.`);  }}
-
-module.exports = (program) => {
+export const command = (program) => {
   program.command('add <command-path>')
     .description('Registers a CLI command for AI invocation')
     .option('-n, --name <name>', 'Explicit name for the command (required if ambiguous)')
@@ -37,6 +29,7 @@ module.exports = (program) => {
     .option('--dev', 'Mark the command as available only in dev')
     .option('--llm-help <command>', 'Command to execute to generate AI doc (default: --llm)', '--llm')
     .option('-d, --description <description>', 'Custom description for the command')
+    .option('-i, --install <command>', 'Command to execute for installation')
     .action((commandPath, options) => {
       const indexPath = getIndexPath(options.global);
       let index = readIndex(indexPath);
@@ -64,6 +57,7 @@ module.exports = (program) => {
         llmHelpSource: options.llmHelp || '--llm',
         dev: options.dev || false,
         global: options.global || false,
+        installCommand: options.install || undefined,
       };
 
       // Basic validation: check if command name already exists
@@ -77,3 +71,6 @@ module.exports = (program) => {
       console.log(`Command '${newCommand.name}' added successfully.`);
     });
 };
+
+// Export helper functions for testing if needed
+export { getCommandDescription };

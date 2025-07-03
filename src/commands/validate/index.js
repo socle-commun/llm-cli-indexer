@@ -1,36 +1,44 @@
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
+import fs from 'fs';
+import path from 'path';
+import os from 'os';
+import { getIndexPath, readIndex, writeIndex } from '../../utils/index.js';
 
-function getIndexPath(isGlobal) {
-  const base = isGlobal ? os.homedir() : process.cwd();
-  return path.join(base, '.llm-cli', 'index.json');
-}
-
-function readIndex(p) {
-  if (!fs.existsSync(p)) return [];
-  return JSON.parse(fs.readFileSync(p, 'utf8'));
-}
-
-module.exports = (program) => {
+export const command = (program) => {
   program.command('validate')
-    .description('Validate the llm-cli index')
-    .option('-g, --global', 'Use global index')
+    .description('Validates the JSON index structure and binary presence')
+    .option('-g, --global', 'Validate global ~/.llm-cli/ instead of local ./.llm-cli/')
     .action((options) => {
       const indexPath = getIndexPath(options.global);
+      if (!fs.existsSync(indexPath)) {
+        console.error(`Error: Index file not found at ${indexPath}`);
+        process.exit(1);
+      }
+
       try {
         const index = readIndex(indexPath);
-        const seen = new Set();
-        index.forEach(cmd => {
-          if (!cmd.name || !cmd.url) throw new Error('Missing required field');
-          if (seen.has(cmd.name)) throw new Error('Duplicate names');
-          seen.add(cmd.name);
-          const filePath = cmd.url.replace('file://', '');
-          if (!fs.existsSync(filePath)) throw new Error(`Missing file ${cmd.name}`);
-        });
+        // Basic validation: check for required fields and duplicates
+        const names = new Set();
+        for (const cmd of index) {
+          if (!cmd.name || !cmd.url || !cmd.description || !cmd.tags || cmd.llmHelpSource === undefined || cmd.dev === undefined || cmd.global === undefined) {
+            console.error(`Error: Command missing required fields: ${JSON.stringify(cmd)}`);
+            process.exit(1);
+          }
+          if (names.has(cmd.name)) {
+            console.error(`Error: Duplicate command name found: ${cmd.name}`);
+            process.exit(1);
+          }
+          names.add(cmd.name);
+
+          // Check if URL points to an existing file
+          const urlPath = cmd.url.replace(/^file:\/\//, '');
+          if (!fs.existsSync(urlPath)) {
+            console.error(`Error: Binary not found for command '${cmd.name}' at ${urlPath}`);
+            process.exit(1);
+          }
+        }
         console.log('Index is valid.');
-      } catch (e) {
-        console.error(`Validation error: ${e.message}`);
+      } catch (error) {
+        console.error(`Error: Invalid index file: ${error.message}`);
         process.exit(1);
       }
     });
