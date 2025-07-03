@@ -4,8 +4,12 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 
-// Import the initAction function directly
-const { initAction } = require('../../../src/commands/init/index.js');
+// Helper function to escape special characters in a string for use in a regular expression
+function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the matched substring
+}
+
+// CLI Testing Guideline: Use execSync to simulate command-line execution.
 
 describe('llm-cli add command', () => {
   const localLlmCliDir = path.join(process.cwd(), '.llm-cli');
@@ -16,31 +20,28 @@ describe('llm-cli add command', () => {
 
   // Helper to clean up directories and files
   const cleanup = () => {
-    console.log('--- Cleaning up ---');
+    // console.log('--- Cleaning up ---');
     if (fs.existsSync(localLlmCliDir)) {
-      console.log(`Removing local .llm-cli directory: ${localLlmCliDir}`);
+      // console.log(`Removing local .llm-cli directory: ${localLlmCliDir}`);
       fs.rmSync(localLlmCliDir, { recursive: true, force: true });
     }
     if (fs.existsSync(globalLlmCliDir)) {
-      console.log(`Removing global .llm-cli directory: ${globalLlmCliDir}`);
+      // console.log(`Removing global .llm-cli directory: ${globalLlmCliDir}`);
       fs.rmSync(globalLlmCliDir, { recursive: true, force: true });
     }
     // Clean up temp scripts directory
     if (fs.existsSync(tempScriptsDir)) {
-      console.log(`Removing temporary scripts directory: ${tempScriptsDir}`);
+      // console.log(`Removing temporary scripts directory: ${tempScriptsDir}`);
       fs.rmSync(tempScriptsDir, { recursive: true, force: true });
     }
-    console.log('--- Cleanup complete ---');
+    // console.log('--- Cleanup complete ---');
   };
 
-  // Helper to initialize index using the imported initAction
+  // Helper to initialize index by running the actual CLI command
   const initIndex = (isGlobal = false) => {
-    const targetDir = isGlobal ? globalLlmCliDir : localLlmCliDir;
-    const targetPath = isGlobal ? globalIndexPath : localIndexPath;
-    console.log(`Initializing index: isGlobal=${isGlobal}, targetDir=${targetDir}, targetPath=${targetPath}`);
-    // Call the initAction directly
-    initAction({ global: isGlobal });
-    console.log(`Index initialized. Exists: ${fs.existsSync(targetPath)}`);
+    const command = isGlobal ? 'node src/index.js init --global' : 'node src/index.js init';
+    // console.log(`Initializing index via CLI: ${command}`);
+    execSync(command);
   };
 
   // Helper to create a dummy script
@@ -48,12 +49,12 @@ describe('llm-cli add command', () => {
     if (!fs.existsSync(tempScriptsDir)) {
       fs.mkdirSync(tempScriptsDir, { recursive: true });
     }
-    const scriptPath = path.join(tempScriptsDir, scriptName);
+    const scriptPath = path.join(tempScriptsDir, scriptName).replace(/\\/g, '/'); // Normalize to forward slashes
     fs.writeFileSync(scriptPath, content);
     if (executable) {
       fs.chmodSync(scriptPath, '755'); // Make executable
     }
-    console.log(`Created dummy script: ${scriptPath}`);
+    // console.log(`Created dummy script: ${scriptPath}`);
     return scriptPath;
   };
 
@@ -69,13 +70,14 @@ describe('llm-cli add command', () => {
   test('should add a new command to local index.json with description', () => {
     initIndex(); // Initialize index explicitly for this test
     const scriptPath = createDummyScript('my-script.js', 'console.log("My script description.");');
-    console.log(`Executing: node src/index.js add ${scriptPath} --name my-script`);
+    // console.log(`Executing: node src/index.js add ${scriptPath} --name my-script`);
     execSync(`node src/index.js add ${scriptPath} --name my-script`);
 
     const indexContent = JSON.parse(fs.readFileSync(localIndexPath, 'utf8'));
     expect(indexContent.length).toBe(1);
     expect(indexContent[0].name).toBe('my-script');
-    expect(indexContent[0].url).toMatch(new RegExp(`file:\/\/.+\/${path.basename(scriptPath).replace(/\./g, '\\.')}$`));
+    const escapedBasename = escapeRegExp(path.basename(scriptPath));
+    expect(indexContent[0].url).toMatch(new RegExp(`file:\/\/.+\/${escapedBasename}`));
     expect(indexContent[0].tags).toEqual([]);
     expect(indexContent[0].dev).toBe(false);
     expect(indexContent[0].global).toBe(false);
@@ -86,13 +88,14 @@ describe('llm-cli add command', () => {
   test('should add a new command to global index.json with tags and dev flag', () => {
     initIndex(true); // Initialize global index explicitly for this test
     const scriptPath = createDummyScript('another-script.js', 'console.log("Another script description.");');
-    console.log(`Executing: node src/index.js add ${scriptPath} --name global-script -t python -t utility --dev --global`);
+    // console.log(`Executing: node src/index.js add ${scriptPath} --name global-script -t python -t utility --dev --global`);
     execSync(`node src/index.js add ${scriptPath} --name global-script -t python -t utility --dev --global`);
 
     const indexContent = JSON.parse(fs.readFileSync(globalIndexPath, 'utf8'));
     expect(indexContent.length).toBe(1);
     expect(indexContent[0].name).toBe('global-script');
-    expect(indexContent[0].url).toMatch(new RegExp(`file:\/\/.+\/${path.basename(scriptPath).replace(/\./g, '\\.')}$`));
+    const escapedBasename = escapeRegExp(path.basename(scriptPath));
+    expect(indexContent[0].url).toMatch(new RegExp(`file:\/\/.+\/${escapedBasename}`));
     expect(indexContent[0].tags).toEqual(['python', 'utility']);
     expect(indexContent[0].dev).toBe(true);
     expect(indexContent[0].global).toBe(true);
@@ -103,7 +106,7 @@ describe('llm-cli add command', () => {
   test('should add a command with a custom llm-help source', () => {
     initIndex(); // Initialize index explicitly for this test
     const scriptPath = createDummyScript('help-script.js', 'console.log("Help script AI documentation.");');
-    console.log(`Executing: node src/index.js add ${scriptPath} --name help-script --llm-help="--ai-doc"`);
+    // console.log(`Executing: node src/index.js add ${scriptPath} --name help-script --llm-help="--ai-doc"`);
     execSync(`node src/index.js add ${scriptPath} --name help-script --llm-help="--ai-doc"`);
 
     const indexContent = JSON.parse(fs.readFileSync(localIndexPath, 'utf8'));
@@ -115,7 +118,7 @@ describe('llm-cli add command', () => {
   test('should add a command with a custom description', () => {
     initIndex(); // Initialize index explicitly for this test
     const scriptPath = createDummyScript('custom-desc-script.js', 'console.log("This is the help description.");');
-    console.log(`Executing: node src/index.js add ${scriptPath} --name custom-desc --description "My custom description."`);
+    // console.log(`Executing: node src/index.js add ${scriptPath} --name custom-desc --description "My custom description."`);
     execSync(`node src/index.js add ${scriptPath} --name custom-desc --description "My custom description."`);
 
     const indexContent = JSON.parse(fs.readFileSync(localIndexPath, 'utf8'));
@@ -128,7 +131,7 @@ describe('llm-cli add command', () => {
     initIndex();
     const scriptPath = createDummyScript('installable-script.js', 'console.log("This script can be installed.");');
     const installCmd = 'npm install -g installable-script-cli';
-    console.log(`Executing: node src/index.js add ${scriptPath} --name installable-script --install "${installCmd}"`);
+    // console.log(`Executing: node src/index.js add ${scriptPath} --name installable-script --install "${installCmd}"`);
     execSync(`node src/index.js add ${scriptPath} --name installable-script --install "${installCmd}"`);
 
     const indexContent = JSON.parse(fs.readFileSync(localIndexPath, 'utf8'));
@@ -141,7 +144,7 @@ describe('llm-cli add command', () => {
   test('should error if command does not respond to help', () => {
     initIndex(); // Initialize index explicitly for this test
     const scriptPath = createDummyScript('non-responsive-script.js', 'process.exit(1);');
-    console.log(`Executing: node src/index.js add ${scriptPath} --name non-responsive`);
+    // console.log(`Executing: node src/index.js add ${scriptPath} --name non-responsive`);
     try {
       execSync(`node src/index.js add ${scriptPath} --name non-responsive`, { stdio: 'pipe' });
     } catch (error) {
@@ -155,11 +158,11 @@ describe('llm-cli add command', () => {
   test('should prevent adding command with duplicate name', () => {
     initIndex(); // Initialize index explicitly for this test
     const script1Path = createDummyScript('script1.js', 'console.log("Script 1 description.");');
-    console.log(`Executing: node src/index.js add ${script1Path} --name duplicate-name`);
+    // console.log(`Executing: node src/index.js add ${script1Path} --name duplicate-name`);
     execSync(`node src/index.js add ${script1Path} --name duplicate-name`);
 
     const script2Path = createDummyScript('script2.js', 'console.log("Script 2 description.");');
-    console.log(`Executing: node src/index.js add ${script2Path} --name duplicate-name`);
+    // console.log(`Executing: node src/index.js add ${script2Path} --name duplicate-name`);
     try {
       execSync(`node src/index.js add ${script2Path} --name duplicate-name`, { stdio: 'pipe' });
     } catch (error) {
