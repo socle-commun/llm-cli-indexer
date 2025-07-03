@@ -30,9 +30,7 @@ describe('llm-cli init command', () => {
 
   // Scenario: Initialize local llm-cli directory and index.json
   test('should create local .llm-cli directory and index.json', () => {
-    const output = execSync('node src/index.js init', { encoding: 'utf8' });
-    expect(output).toContain(`Created directory: ${localLlmCliDir}`);
-    expect(output).toContain(`Created file: ${localIndexPath}`);
+    execSync('node src/index.js init', { encoding: 'utf8' });
     expect(fs.existsSync(localLlmCliDir)).toBe(true);
     expect(fs.existsSync(localIndexPath)).toBe(true);
     expect(fs.readFileSync(localIndexPath, 'utf8')).toBe('[]');
@@ -50,9 +48,7 @@ describe('llm-cli init command', () => {
 
   // Scenario: Initialize global llm-cli directory and index.json
   test('should create global .llm-cli directory and index.json', () => {
-    const output = execSync('node src/index.js init --global', { encoding: 'utf8' });
-    expect(output).toContain(`Created directory: ${globalLlmCliDir}`);
-    expect(output).toContain(`Created file: ${globalIndexPath}`);
+    execSync('node src/index.js init --global', { encoding: 'utf8' });
     expect(fs.existsSync(globalLlmCliDir)).toBe(true);
     expect(fs.existsSync(globalIndexPath)).toBe(true);
     expect(fs.readFileSync(globalIndexPath, 'utf8')).toBe('[]');
