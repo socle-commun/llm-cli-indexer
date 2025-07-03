@@ -30,6 +30,7 @@ All development will strictly adhere to a "DOC FIRST" philosophy. This means:
 
 ## Strict Restrictions
 Limit file size to **100 lines per file**.
+The root `README.md` may exceed this limit for comprehensive documentation.
 
 ## Technology Stack
 -   **Language:** Javascript
