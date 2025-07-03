@@ -25,6 +25,7 @@ All development will strictly adhere to a "DOC FIRST" philosophy. This means:
 
 ## Key Documentation
 -   [Creating New CLI Commands](./docs/commands.md)
+-   [Refactoring Roadmap](./docs/refactoring-roadmap.md)
 
 
 
