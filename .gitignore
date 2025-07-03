@@ -54,3 +54,6 @@ cache/
 
 # Test coverage
 coverage/
+
+# Temporary commit message file
+commit_message.txt
