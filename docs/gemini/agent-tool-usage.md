@@ -1,0 +1,3 @@
+### Agent Tool Usage Best Practices
+
+-   **`replace` Tool Precision**: When using the `replace` tool, always provide the `old_string` and `new_string` with exact literal content, including all whitespace and indentation. For multiple occurrences of the `old_string`, explicitly set the `expected_replacements` parameter to the number of expected replacements. This prevents unintended modifications or tool failures due to ambiguous matches.
