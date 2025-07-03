@@ -3,7 +3,13 @@ import { execSync } from 'child_process';
 import { existsSync, readFileSync, rmSync } from 'fs';
 
 const buildDocs = () => {
-  execSync('npm run docs:build', { stdio: 'inherit' });
+  try {
+    // Use sh -c to ensure npm is found in the PATH within the shell environment
+    execSync('sh -c "npm run docs:build"', { stdio: 'inherit' });
+  } catch (error) {
+    console.error('Error building docs:', error.message);
+    throw error; // Re-throw to fail the test
+  }
 };
 
 const cleanDist = () => {
@@ -14,6 +20,7 @@ const cleanDist = () => {
 
 describe('Documentation build', () => {
   beforeAll(() => {
+    cleanDist(); // Clean before building to ensure a fresh build
     buildDocs();
   });
 
@@ -30,4 +37,3 @@ describe('Documentation build', () => {
     expect(content).toMatch(/Welcome/);
   });
 });
-
