@@ -11,6 +11,9 @@ As the AI agent, you are the main execution agent and the engine of this project
 2.  **Observe** any modification and suggest reorganization if useful.
 3.  **Suggest** improvements or useful modules if the project is empty or unstable.
 
+### Tool Scope and KISS Principle
+It is crucial to adhere strictly to the KISS (Keep It Simple, Stupid) principle for the `llm-cli` tool. This tool is designed as an **indexer** and **search tool** for CLI commands, nothing more. It is not intended to be an execution tool for the indexed commands. Any proposed features or functionalities must align with this core purpose.
+
 ## Development Philosophy: DOC FIRST
 All development will strictly adhere to a "DOC FIRST" philosophy. This means:
 1.  **Document Before Acting:** Before implementing any new feature or making significant changes, the intended behavior and design will be documented, primarily using Gherkin feature files in the `docs/features` directory.
