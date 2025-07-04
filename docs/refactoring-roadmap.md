@@ -31,16 +31,22 @@ To achieve a consistent and modern JavaScript module system (ES Modules) across 
 
 ### Phase 2: Refactor Tests for Robustness
 *   **Objective**: Make tests more reliable, faster, and easier to debug by minimizing `execSync` and improving isolation.
-*   **Status**: Not Started
+*   **Status**: In Progress
 *   **Steps**:
+    *   **Modularization of `add` command**: The `add` command's logic has been fragmented into smaller, single-responsibility process files located in `src/commands/add/processes/`.
+        *   `getCommandDescription.process.js`: Handles inferring command descriptions.
+        *   `inferTagsFromExtension.process.js`: Handles inferring tags from file extensions.
+        *   `processConfigFile.process.js`: Manages adding commands from a configuration file.
+        *   `processSingleCommand.process.js`: Manages adding a single command.
+    *   **Co-located Unit Tests for Processes**: Dedicated unit tests have been created for each process file, located alongside the process files themselves (e.g., `src/commands/add/processes/getCommandDescription.process.test.js`). These tests mock external dependencies to ensure true unit isolation.
     *   **`tests/commands/*.test.js`**: Convert all test files to use ES Module syntax (`import`).
         *   `tests/commands/init.test.js` (To do)
         *   `tests/commands/add.test.js` (To do)
         *   `tests/commands/list.test.js` (To do)
         *   `tests/commands/remove.test.js` (To do)
         *   `tests/commands/search.test.js` (To do)
-        *   `tests/commands/update.test.js` (To do)
-        *   `tests/commands/validate.test.js` (To do)
+        *   `tests/commands/update/index.js` (To do)
+        *   `tests/commands/validate/index.js` (To do)
     *   **Initialisation de l'Index dans les Tests**: For tests requiring an initialized index, import and call `initAction` directly instead of using `execSync('node src/index.js init')`. This will execute initialization within the same test process, avoiding `execSync` and file system state issues.
     *   **Robust Cleanup**: Confirm `cleanup` functions use `fs.rmSync(..., { recursive: true, force: true })` for reliable temporary directory removal. (Already implemented in some tests, needs verification across all).
     *   **Improved Assertions**: For `init` command tests, verify file system existence and content directly rather than relying on exact console output.
@@ -55,4 +61,4 @@ To achieve a consistent and modern JavaScript module system (ES Modules) across 
 
 ## Next Immediate Steps
 
-I will now proceed with **Phase 2**, starting with `tests/commands/init.test.js` and `tests/commands/add.test.js` to make them more robust by directly importing and calling command actions where appropriate.
+I will now proceed with running the newly created unit tests for the `add` command processes to ensure their correctness and then integrate them into the overall test suite. This will be followed by addressing the remaining issues in the higher-level `add` command tests.

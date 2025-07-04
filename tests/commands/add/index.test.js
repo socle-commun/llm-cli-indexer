@@ -21,7 +21,7 @@ describe('llm-cli add command', () => {
 
   test('should add a new command to local index.json with description', () => {
     const scriptPath = createDummyScript('my-script.js', 'My script description.');
-    execSync(`node src/index.js add ${scriptPath} --name my-script`);
+    execSync(`node src/index.js add --name my-script ${scriptPath}`);
 
     const indexContent = JSON.parse(fs.readFileSync(localIndexPath, 'utf8'));
     expect(indexContent.length).toBe(1);

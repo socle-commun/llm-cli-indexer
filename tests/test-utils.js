@@ -62,7 +62,8 @@ export const createDummyScript = (scriptName, descriptionContent, executable = t
   console.log(`DEBUG: createDummyScript - scriptName: ${scriptName}, scriptPath: ${scriptPath}`);
 
   const scriptContent = `#!/usr/bin/env node
-${descriptionContent}`;
+console.log("${descriptionContent}");
+`;
 
   fs.writeFileSync(scriptPath, scriptContent);
   if (executable) {
