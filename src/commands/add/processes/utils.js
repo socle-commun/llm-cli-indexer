@@ -47,3 +47,16 @@ export function inferTagsFromExtension(filePath) {
       return [];
   }
 }
+
+/**
+ * Strips leading and trailing quotes from a string.
+ * @param {string} str - The input string.
+ * @returns {string} The string with quotes stripped.
+ */
+export function stripQuotes(str) {
+  if (typeof str !== 'string') {
+    return str;
+  }
+  // Remove leading/trailing single or double quotes
+  return str.replace(/^['"\\]+|['"\\]+$/g, '');
+}

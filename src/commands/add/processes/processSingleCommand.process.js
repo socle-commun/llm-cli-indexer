@@ -7,7 +7,7 @@
 import fs from 'fs';
 import path from 'path';
 import { getCommandDescription } from './getCommandDescription.process.js';
-import { inferTagsFromExtension } from './inferTagsFromExtension.process.js';
+import { inferTagsFromExtension, stripQuotes } from './utils.js';
 
 /**
  * Processes a single command and adds it to the index.
@@ -21,12 +21,12 @@ export function processSingleCommand(commandNameOrPath, options, index, indexPat
   let fullCommandString = Array.isArray(commandNameOrPath) ? commandNameOrPath.join(' ') : commandNameOrPath;
 
   let newCommand = {
-    name: options.name || fullCommandString,
-    tags: options.tag || [],
-    llmHelpSource: options.llmHelp || '--help',
+    name: stripQuotes(options.name || fullCommandString),
+    tags: (options.tag || []).map(tag => stripQuotes(tag)),
+    llmHelpSource: stripQuotes(options.llmHelp || '--help'),
     dev: options.dev || false,
     global: options.global || false,
-    installCommand: options.install || undefined,
+    installCommand: stripQuotes(options.install) || undefined,
   };
 
   let description = '';
@@ -47,7 +47,7 @@ export function processSingleCommand(commandNameOrPath, options, index, indexPat
   }
 
   if (options.description) {
-    description = options.description;
+    description = stripQuotes(options.description);
   } else {
     try {
       // For system commands, pass the command name directly

@@ -21,6 +21,7 @@ export function processConfigFile(options, index, indexPath, writeIndex) {
     if (!fs.existsSync(options.config)) {
       console.error(`Error: Configuration file '${options.config}' not found.`);
       process.exit(1);
+      return;
     }
     const configFileContent = fs.readFileSync(options.config, 'utf8');
     let commandsToAdd;
@@ -29,11 +30,13 @@ export function processConfigFile(options, index, indexPath, writeIndex) {
     } catch (jsonError) {
       console.error(`Error: Invalid JSON format in configuration file '${options.config}'.`);
       process.exit(1);
+      return;
     }
 
     if (!Array.isArray(commandsToAdd)) {
       console.error(`Error: Configuration file '${options.config}' must contain a JSON array of commands.`);
       process.exit(1);
+      return;
     }
 
     const newCommandNames = new Set();
@@ -63,12 +66,14 @@ export function processConfigFile(options, index, indexPath, writeIndex) {
       if (!cmd.name || !cmd.url || !cmd.description || cmd.tags === undefined || cmd.llmHelpSource === undefined || cmd.dev === undefined || cmd.global === undefined) {
         console.error(`Error: Command from configuration is missing required fields: ${JSON.stringify(cmd)}`);
         process.exit(1);
+        return;
       }
 
       // Check for duplicate names within the config file itself
       if (newCommandNames.has(cmd.name)) {
         console.error(`Error: Duplicate command name found in configuration: ${cmd.name}`);
         process.exit(1);
+        return;
       }
       newCommandNames.add(cmd.name);
 
@@ -76,6 +81,7 @@ export function processConfigFile(options, index, indexPath, writeIndex) {
       if (index.some(existingCmd => existingCmd.name === cmd.name)) {
         console.error(`Error: Command with name '${cmd.name}' already exists in the index.`);
         process.exit(1);
+        return;
       }
     }
 

@@ -6,6 +6,8 @@ import { getCommandDescription } from './getCommandDescription.process.js';
 import { inferTagsFromExtension } from './inferTagsFromExtension.process.js';
 
 // Mock external dependencies
+
+
 vi.mock('fs', async () => {
   const actual = await vi.importActual('fs');
   return {
@@ -15,9 +17,13 @@ vi.mock('fs', async () => {
   };
 });
 
-vi.mock('path', () => ({
-  extname: vi.fn(),
-}));
+vi.mock('path', async () => {
+  const actual = await vi.importActual('path');
+  return {
+    ...actual,
+    extname: vi.fn(),
+  };
+});
 
 vi.mock('./getCommandDescription.process.js', () => ({
   getCommandDescription: vi.fn(),

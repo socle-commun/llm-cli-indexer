@@ -2,17 +2,18 @@ import { describe, test, expect } from 'vitest';
 import { inferTagsFromExtension } from './inferTagsFromExtension.process.js';
 
 describe('inferTagsFromExtension.process.js', () => {
-  test('should return ['javascript'] for .js files', () => {
+
+  test("should return ['javascript'] for .js files", () => {
     expect(inferTagsFromExtension('script.js')).toEqual(['javascript']);
     expect(inferTagsFromExtension('path/to/file.js')).toEqual(['javascript']);
   });
 
-  test('should return ['python'] for .py files', () => {
+  test("should return ['python'] for .py files", () => {
     expect(inferTagsFromExtension('script.py')).toEqual(['python']);
     expect(inferTagsFromExtension('path/to/file.py')).toEqual(['python']);
   });
 
-  test('should return ['shell', 'bash'] for .sh files', () => {
+  test("should return ['shell', 'bash'] for .sh files", () => {
     expect(inferTagsFromExtension('script.sh')).toEqual(['shell', 'bash']);
     expect(inferTagsFromExtension('path/to/file.sh')).toEqual(['shell', 'bash']);
   });

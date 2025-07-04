@@ -10,20 +10,21 @@ vi.mock('child_process', () => ({
 }));
 
 // Mock fs and path for file existence checks
-vi.mock('fs', async () => {
-  const actual = await vi.importActual('fs');
-  return {
-    ...actual,
+
+vi.mock('fs', () => ({
+  default: {
     existsSync: vi.fn(),
     lstatSync: vi.fn(),
     readFileSync: vi.fn(),
-  };
-});
+  },
+}));
 
 vi.mock('path', () => ({
-  resolve: vi.fn((p) => p),
-  dirname: vi.fn((p) => p.split('/').slice(0, -1).join('/')),
-  extname: vi.fn((p) => '.js'), // Default for simplicity in mocks
+  default: {
+    resolve: vi.fn((p) => p),
+    dirname: vi.fn((p) => p.split('/').slice(0, -1).join('/')),
+    extname: vi.fn(() => '.js'),
+  },
 }));
 
 describe('getCommandDescription.process.js', () => {
