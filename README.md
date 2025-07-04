@@ -233,6 +233,23 @@ export type LLMCommand = {
 
 ## 🤖 Utilisation avec une IA
 
+### Intégration avec Gemini (pour les agents)
+
+Pour que l'agent Gemini puisse utiliser `llm-cli` efficacement, ajoutez le snippet suivant à son fichier `GEMINI.md` :
+
+```markdown
+--- Context from: GEMINI.md ---
+## Gemini Agent Integration with llm-cli
+
+When a user asks to find, list, or interact with CLI commands, remember that clients and commands are available locally. Before taking any action, use the `llm-cli search` command to discover relevant commands.
+
+- To list all available commands: `llm-cli list`
+- To search for commands by keyword: `llm-cli search <keywords>`
+- To get detailed help for a command: `llm-cli doc <command-name>`
+
+Example usage in a tool call:
+```
+
 Un agent peut :
 
 * Explorer : `llm-cli list` / `llm-cli search`
