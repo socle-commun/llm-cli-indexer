@@ -37,7 +37,16 @@ llm-cli init [options]
 Enregistre une commande CLI pour qu’elle soit connue et invocable par l’IA.
 
 ```bash
-llm-cli add [options] <command-path> 
+llm-cli add [options] <command-path>
+```
+
+```bash
+llm-cli add [options] <command>
+  -n, --name         Nom explicite
+  -t, --tag          Tag (répétable)
+  -g, --global       Ajout global
+      --dev          Marque la commande comme dev-only
+      --llm-help     Commande alternative pour l’IA
 ```
 
 #### Options
@@ -48,7 +57,7 @@ llm-cli add [options] <command-path>
 | `-t`         | `--tag`    | `string[]` | Tag(s) associé(s), répétables (`-t analyze -t ast`)            |
 | `-g`         | `--global` | `boolean`  | Enregistre dans `~/.llm-cli/` au lieu de `./.llm-cli/`         |
 | `--dev`      | –          | `boolean`  | Marque la commande comme disponible uniquement en dev          |
-| `--help`     | –          | `string`   | Commande à exécuter pour générer une doc IA (default: `--help`)|
+| `--llm-help` | –          | `string`   | Commande à exécuter pour générer une doc IA (default: `--help`)|
 | `-d` | `--description` | `string` | Description personnalisée |
 | `-i` | `--install` | `string` | Commande d'installation |
 | `--config` | – | `string` | Fichier JSON de plusieurs commandes |
@@ -142,6 +151,16 @@ Valide la structure de l’index JSON et la présence réelle des binaires.
 
 ---
 
+### 📖 `llm-cli doc <name>`
+
+```bash
+llm-cli doc "<name>"
+```
+
+Affiche la documentation complète pour une commande (résultat de `--llm-help` ou extrait JSON). *(TODO)*
+
+---
+
 ## 📂 Exemple d’ajout complet
 
 ```bash
@@ -167,6 +186,14 @@ Résultat dans `~/.llm-cli/index.json` :
 
 ---
 
+### 🧠 Comportement par défaut
+
+- `--llm-help` utilise `--help` si absent
+- Si `--name` est absent, le nom est généré depuis `<command-path>` et les arguments
+- `validate` vérifie aussi l’accessibilité de la commande (`which`, `fs.existsSync`, etc.)
+
+---
+
 ## 🧾 Spécification du fichier `index.json`
 
 > 📍 Fichier : `./.llm-cli/index.json` ou `~/.llm-cli/index.json`
@@ -184,6 +211,15 @@ export type LLMCommand = {
   dev?: boolean;
 };
 ```
+
+| Champ           | Interprétation IA                         | Effet                          |
+| --------------- | ------------------------------------------- | ------------------------------ |
+| `dev`           | Exclu en prod sans override                 | invisible sauf `--include-dev` |
+| `global`        | Optionnel, scope d’origine                  | exposé à l’IA                |
+| `llmHelpSource` | Commande à appeler pour générer la doc IA | utilisée en priorité           |
+| `tags`          | Indexation + recherche                      | fortement recommandés          |
+
+> 🧠 Le fichier `index.json` peut être validé avec [schema.json](.llm-cli/schema.json) si vous utilisez un IDE compatible ou une pipeline CI.
 
 ---
 
