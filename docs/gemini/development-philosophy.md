@@ -13,11 +13,14 @@ All development will strictly adhere to a "DOC FIRST" philosophy. This means:
 
 To facilitate focused development and debugging, tests can be executed for specific features. This allows for rapid iteration on a single command or functionality without running the entire test suite.
 
+**Test File Organization:**
+Each CLI command will have its tests organized within a dedicated subdirectory under `tests/commands/`. For example, tests for the `init` command will be located in `tests/commands/init/`.
+
 **Steps:**
-1.  **Identify the Test File**: Locate the test file corresponding to the feature you are working on (e.g., `tests/commands/init.test.js` for the `init` command).
+1.  **Identify the Test File**: Locate the main test file for the feature you are working on (e.g., `tests/commands/init/index.test.js` or `tests/commands/init/init.test.js` for the `init` command).
 2.  **Run Targeted Tests**: Use the Vitest CLI to execute only that specific test file:
     ```bash
     vitest <path/to/your/test/file.test.js>
     ```
-    For example: `vitest tests/commands/init.test.js`
+    For example: `vitest tests/commands/init/index.test.js`
 3.  **Iterate and Debug**: Work on the feature and its tests, running only the relevant tests until they pass.

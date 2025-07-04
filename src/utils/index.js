@@ -6,7 +6,7 @@ const LLM_CLI_DIR = '.llm-cli';
 const INDEX_FILE = 'index.json';
 
 export function getIndexPath(isGlobal) {
-  const base = isGlobal ? os.homedir() : process.cwd();
+  const base = isGlobal ? os.homedir() : '.';
   return path.join(base, LLM_CLI_DIR, INDEX_FILE);
 }
 
@@ -19,5 +19,10 @@ export function readIndex(indexPath) {
 }
 
 export function writeIndex(indexPath, data) {
+  const dir = path.dirname(indexPath);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+  console.log(`DEBUG: Write index to ${indexPath}.`);
   fs.writeFileSync(indexPath, JSON.stringify(data, null, 2));
 }

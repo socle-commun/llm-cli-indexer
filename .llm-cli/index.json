@@ -1,0 +1,11 @@
+[
+  {
+    "name": "comet analyze",
+    "tags": [],
+    "llmHelpSource": "--help",
+    "dev": false,
+    "global": false,
+    "command": "comet analyze",
+    "description": "\u001b[1;1H\u001b[0J"
+  }
+]

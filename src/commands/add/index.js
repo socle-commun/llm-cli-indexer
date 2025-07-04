@@ -4,38 +4,76 @@ import os from 'os';
 import { execSync } from 'child_process';
 import { getIndexPath, readIndex, writeIndex } from '../../utils/index.js';
 
-function getCommandDescription(commandPath, llmHelpSource) {
-  let commandToExecute = `${commandPath} ${llmHelpSource}`;
-  if (commandPath.endsWith('.js')) {
-    commandToExecute = `node ${commandPath} ${llmHelpSource}`;
+function getCommandDescription(commandToDescribe, llmHelpSource) {
+  let commandToExecute;
+  // Always execute from the project root
+  let cwd = process.cwd(); 
+
+  // If commandToDescribe is a file path, ensure it's an absolute path for execution
+  if (fs.existsSync(commandToDescribe) && fs.lstatSync(commandToDescribe).isFile()) {
+    const absolutePath = path.resolve(commandToDescribe);
+    console.log(`DEBUG: getCommandDescription - commandToDescribe: ${commandToDescribe}, absolutePath: ${absolutePath}, cwd: ${cwd}`);
+    if (commandToDescribe.endsWith('.js')) {
+      commandToExecute = `node "${absolutePath}" ${llmHelpSource}`;
+    } else {
+      // For other executable files (e.g., .py, .sh), try direct execution
+      commandToExecute = `"${absolutePath}" ${llmHelpSource}`;
+    }
+  } else {
+    // Assume it's a system command
+    commandToExecute = `${commandToDescribe} ${llmHelpSource}`;
   }
 
   try {
-    const output = execSync(commandToExecute, { encoding: 'utf8', stdio: 'pipe' });
+    const output = execSync(commandToExecute, { encoding: 'utf8', stdio: 'pipe', shell: true, cwd: cwd });
     const lines = output.split(/\r?\n/).map(line => line.trim()).filter(line => line.length > 0);
     return lines.length > 0 ? lines[0] : '';
   } catch (error) {
     console.error(`Error executing '${commandToExecute}': ${error.message}`);
-    throw new Error(`Command '${path.basename(commandPath)}' did not respond to ${llmHelpSource} or returned an error.`);
+    // Ne doit pas jeter d'erreur ici, car llmHelpSource peut être inconnu
+    // exemple: un fichier de script qui ne prend pas --llm en argument
+    return ''; // Return empty string if description cannot be inferred
+  }
+}
+
+function inferTagsFromExtension(filePath) {
+  const ext = path.extname(filePath).toLowerCase();
+  switch (ext) {
+    case '.js':
+      return ['javascript'];
+    case '.py':
+      return ['python'];
+    case '.sh':
+      return ['shell', 'bash'];
+    default:
+      return [];
   }
 }
 
 export const command = (program) => {
-  program.command('add [command-path]') // command-path is now optional
+  program.command('add [command...]')
     .description('Registers a CLI command for AI invocation or adds commands from a config file')
     .option('-n, --name <name>', 'Explicit name for the command (required if ambiguous)')
     .option('-t, --tag <tag...>', 'Tag(s) associated, repeatable (-t analyze -t ast)')
     .option('-g, --global', 'Register in ~/.llm-cli/ instead of ./.llm-cli/')
     .option('--dev', 'Mark the command as available only in dev')
-    .option('--llm-help <command>', 'Command to execute to generate AI doc (default: --llm)', '--llm')
+    .option('--llm-help <command>', 'Command to execute to generate AI doc (default: --help)', '--help')
     .option('-d, --description <description>', 'Custom description for the command')
     .option('-i, --install <command>', 'Command to execute for installation')
     .option('--config <file>', 'Path to a JSON configuration file containing multiple commands')
-    .action((commandPath, options) => {
+    .action((commandNameOrPath, options) => {
+      let fullCommandString;
+      if (Array.isArray(commandNameOrPath)) {
+        fullCommandString = commandNameOrPath.join(' ');
+      } else {
+        fullCommandString = commandNameOrPath;
+      }
+
       const indexPath = getIndexPath(options.global);
       let index = readIndex(indexPath);
 
       if (options.config) {
+        console.log(`DEBUG: options.config received: ${options.config}`);
         // Logic for adding commands from a config file
         try {
           if (!fs.existsSync(options.config)) {
@@ -58,6 +96,27 @@ export const command = (program) => {
 
           const newCommandNames = new Set();
           for (const cmd of commandsToAdd) {
+            // Apply default values if not provided in config
+            cmd.llmHelpSource = cmd.llmHelpSource || '--llm';
+            cmd.dev = cmd.dev || false;
+            cmd.global = cmd.global || false;
+            cmd.tags = cmd.tags || [];
+
+            // Infer description and tags if not provided in config
+            if (!cmd.description && cmd.url.startsWith('file://')) {
+              try {
+                const resolvedPath = cmd.url.replace(/^file:\/\//, '');
+                cmd.description = getCommandDescription(resolvedPath, cmd.llmHelpSource);
+              } catch (error) {
+                console.warn(`Warning: Could not infer description for command '${cmd.name}': ${error.message}`);
+                cmd.description = ''; // Default to empty if inference fails
+              }
+            }
+            if (cmd.tags.length === 0 && cmd.url.startsWith('file://')) {
+              const resolvedPath = cmd.url.replace(/^file:\/\//, '');
+              cmd.tags = inferTagsFromExtension(resolvedPath);
+            }
+
             // Validate required fields for each command from config
             if (!cmd.name || !cmd.url || !cmd.description || cmd.tags === undefined || cmd.llmHelpSource === undefined || cmd.dev === undefined || cmd.global === undefined) {
               console.error(`Error: Command from configuration is missing required fields: ${JSON.stringify(cmd)}`);
@@ -87,33 +146,47 @@ export const command = (program) => {
           console.error(`Error processing configuration file: ${error.message}`);
           process.exit(1);
         }
-      } else if (commandPath) {
-        // Existing logic for adding a single command
-        const resolvedPath = path.resolve(commandPath).replace(/\\/g, '/'); // Normalize path for URL
+      } else if (fullCommandString || options.name) {
+        let newCommand = {
+          name: options.name || fullCommandString,
+          tags: options.tag || [],
+          llmHelpSource: options.llmHelp || '--help',
+          dev: options.dev || false,
+          global: options.global || false,
+          installCommand: options.install || undefined,
+        };
 
         let description = '';
-        if (options.description) { // Prioritize user-provided description
+        let executablePath = '';
+
+        // Determine if fullCommandString is a file path or a system command
+        const isFilePath = fs.existsSync(fullCommandString) && fs.lstatSync(fullCommandString).isFile();
+
+        if (isFilePath) {
+          executablePath = path.resolve(fullCommandString).replace(/\\/g, '/');
+          newCommand.url = `file://${executablePath}`;
+          if (newCommand.tags.length === 0) {
+            newCommand.tags = inferTagsFromExtension(executablePath);
+          }
+        } else {
+          // Assume it's a system command
+          newCommand.command = fullCommandString;
+        }
+
+        if (options.description) {
           description = options.description;
         } else {
-          // Validate if the command exists and responds to help
           try {
-            description = getCommandDescription(resolvedPath, options.llmHelp || '--llm');
+            // For system commands, pass the command name directly
+            // For file paths, pass the resolved path
+            const commandToDescribe = isFilePath ? executablePath : fullCommandString;
+            description = getCommandDescription(commandToDescribe, newCommand.llmHelpSource);
           } catch (error) {
             console.error(`Error: ${error.message}`);
             process.exit(1);
           }
         }
-
-        const newCommand = {
-          name: options.name || path.basename(commandPath),
-          url: `file://${resolvedPath}`,
-          description: description,
-          tags: options.tag || [],
-          llmHelpSource: options.llmHelp || '--llm',
-          dev: options.dev || false,
-          global: options.global || false,
-          installCommand: options.install || undefined,
-        };
+        newCommand.description = description;
 
         // Basic validation: check if command name already exists
         if (index.some(cmd => cmd.name === newCommand.name)) {
@@ -125,11 +198,11 @@ export const command = (program) => {
         writeIndex(indexPath, index);
         console.log(`Command '${newCommand.name}' added successfully.`);
       } else {
-        console.error('Error: Missing command-path or --config option.');
+        console.error('Error: Missing command or --config option.');
         program.help();
       }
     });
 };
 
 // Export helper functions for testing if needed
-export { getCommandDescription };
+export { getCommandDescription, inferTagsFromExtension };

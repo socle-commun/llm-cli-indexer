@@ -4,8 +4,7 @@ import { existsSync, readFileSync, rmSync } from 'fs';
 
 const buildDocs = () => {
   try {
-    // Use sh -c to ensure npm is found in the PATH within the shell environment
-    execSync('sh -c "npm run docs:build"', { stdio: 'inherit' });
+    execSync('npm run docs:build', { stdio: 'inherit', shell: true });
   } catch (error) {
     console.error('Error building docs:', error.message);
     throw error; // Re-throw to fail the test

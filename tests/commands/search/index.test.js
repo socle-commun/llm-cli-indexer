@@ -1,27 +1,15 @@
-import { describe, test, expect, beforeEach, afterEach } from 'vitest';
+import { describe, test, expect } from 'vitest';
 import { execSync } from 'child_process';
-import fs from 'fs';
+import { cleanup, writeIndex } from '../../test-utils.js';
 import path from 'path';
-import os from 'os';
 
 const localDir = path.join(process.cwd(), '.llm-cli');
 const localIndex = path.join(localDir, 'index.json');
 
-const cleanup = () => {
-  if (fs.existsSync(localDir)) fs.rmSync(localDir, { recursive: true, force: true });
-};
-
-const writeIndex = (data) => {
-  fs.mkdirSync(localDir, { recursive: true });
-  fs.writeFileSync(localIndex, JSON.stringify(data, null, 2));
-};
-
-beforeEach(cleanup);
-afterEach(cleanup);
-
 describe('llm-cli search', () => {
   test('search by keyword', () => {
-    writeIndex([
+    cleanup();
+    writeIndex(false, [
       { name: 'analyze-code', description: 'Analyzes source code', url: 'file:///a' },
       { name: 'build-project', url: 'file:///b' }
     ]);
@@ -31,7 +19,8 @@ describe('llm-cli search', () => {
   });
 
   test('search by tag', () => {
-    writeIndex([
+    cleanup();
+    writeIndex(false, [
       { name: 'typescript-linter', tags: ['typescript', 'lint'], url: 'file:///t' },
       { name: 'python-formatter', tags: ['python', 'format'], url: 'file:///p' }
     ]);
@@ -41,7 +30,8 @@ describe('llm-cli search', () => {
   });
 
   test('include dev commands', () => {
-    writeIndex([
+    cleanup();
+    writeIndex(false, [
       { name: 'prod-tool', dev: false, url: 'file:///p' },
       { name: 'dev-tool', dev: true, url: 'file:///d' }
     ]);

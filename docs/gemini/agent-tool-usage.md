@@ -1,3 +1,4 @@
 ### Agent Tool Usage Best Practices
 
 -   **`replace` Tool Precision**: When using the `replace` tool, always provide the `old_string` and `new_string` with exact literal content, including all whitespace and indentation. For multiple occurrences of the `old_string`, explicitly set the `expected_replacements` parameter to the number of expected replacements. This prevents unintended modifications or tool failures due to ambiguous matches.
+-   **Variable Casing and Import Consistency**: Ensure strict adherence to variable casing (e.g., `camelCase` vs. `SCREAMING_SNAKE_CASE`) and consistent import/export practices across files. Mismatched casing or incorrect import paths can lead to `undefined` variables and runtime errors, especially when dealing with file system operations.

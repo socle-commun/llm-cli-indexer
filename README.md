@@ -1,6 +1,6 @@
 # 🧠 `llm-cli` — LLM-Friendly Command Line Index
 
-Un outil pour exposer vos scripts, binaires ou outils CLI à une IA (ou à vous-même)  
+Un outil pour exposer des scripts, binaires ou outils CLI à une IA (ou à vous-même)  
 grâce à une interface standardisée, locale ou globale, compatible LLM.
 
 ---
@@ -10,7 +10,7 @@ grâce à une interface standardisée, locale ou globale, compatible LLM.
 Aucune dépendance externe. Copiez le binaire, utilisez avec `deno run` ou compilez votre version.
 
 ```bash
-deno run -A llm-cli.ts add ./bin/comet ...
+llm-cli add -t analyze -t ast "comet analyze"
 ````
 
 ---
@@ -22,7 +22,7 @@ deno run -A llm-cli.ts add ./bin/comet ...
 Enregistre une commande CLI pour qu’elle soit connue et invocable par l’IA.
 
 ```bash
-llm-cli add <command-path> [options]
+llm-cli add [options] <command-path> 
 ```
 
 #### Options
@@ -33,14 +33,14 @@ llm-cli add <command-path> [options]
 | `-t`         | `--tag`    | `string[]` | Tag(s) associé(s), répétables (`-t analyze -t ast`)            |
 | `-g`         | `--global` | `boolean`  | Enregistre dans `~/.llm-cli/` au lieu de `./.llm-cli/`         |
 | `--dev`      | –          | `boolean`  | Marque la commande comme disponible uniquement en dev          |
-| `--llm-help` | –          | `string`   | Commande à exécuter pour générer une doc IA (default: `--llm`) |
+| `--help`     | –          | `string`   | Commande à exécuter pour générer une doc IA (default: `--help`)|
 
 ---
 
 ### ➖ `llm-cli remove`
 
 ```bash
-llm-cli remove <name> [-g]
+llm-cli remove [-g] <name> 
 ```
 
 Supprime une commande enregistrée.
@@ -50,7 +50,7 @@ Supprime une commande enregistrée.
 ### 🔁 `llm-cli update`
 
 ```bash
-llm-cli update <name> [options]
+llm-cli update [options] <name>
 ```
 
 Modifie un ou plusieurs champs d'une commande enregistrée.
@@ -60,7 +60,7 @@ Modifie un ou plusieurs champs d'une commande enregistrée.
 ### 📜 `llm-cli list`
 
 ```bash
-llm-cli list [--include-dev]
+llm-cli [--include-dev] list 
 ```
 
 Liste les commandes disponibles (hors `dev` par défaut).
@@ -70,7 +70,7 @@ Liste les commandes disponibles (hors `dev` par défaut).
 ### 🔎 `llm-cli search`
 
 ```bash
-llm-cli search <keywords...> [--include-dev]
+llm-cli search [--include-dev] <keywords...> 
 ```
 
 Recherche des commandes enregistrées par nom, description ou tag.
@@ -80,7 +80,7 @@ Recherche des commandes enregistrées par nom, description ou tag.
 ### ✅ `llm-cli validate`
 
 ```bash
-llm-cli validate [-g]
+llm-cli [-g] validate 
 ```
 
 Valide la structure de l’index JSON et la présence réelle des binaires.
@@ -90,11 +90,11 @@ Valide la structure de l’index JSON et la présence réelle des binaires.
 ## 📂 Exemple d’ajout complet
 
 ```bash
-llm-cli add ./bin/comet \
+llm-cli add \
   -n "comet analyze" \
-  -t ast -t parse -t typescript \
-  --llm-help="--llm" \
-  -g
+  -t project -t analyze -t tree -t ast \
+  --llm-help="--help" \
+  comet analyze
 ```
 
 Résultat dans `~/.llm-cli/index.json` :
@@ -102,12 +102,11 @@ Résultat dans `~/.llm-cli/index.json` :
 ```json
 {
   "name": "comet analyze",
-  "url": "file:///home/user/project/bin/comet",
-  "description": "Parse et analyse statique d’un projet JS/TS pour extraire l’AST et détecter les patterns",
-  "tags": ["ast", "parse", "typescript"],
-  "llmHelpSource": "--llm",
-  "dev": false,
-  "global": true
+  "command": "comet",
+  "description": "Analyse du projet",
+  "tags": ["project", "analyze", "tree", "ast"],
+  "llmHelpSource": "--help",
+  "dev": false
 }
 ```
 
@@ -122,12 +121,12 @@ Résultat dans `~/.llm-cli/index.json` :
 ```ts
 export type LLMCommand = {
   name: string;
-  url: string; // ex: "file:///absolute/path/to/script.sh"
-  description: string;
+  url?: string; // ex: "file:///absolute/path/to/script.sh"
+  command?: string;
+  description?: string;
   tags: string[];
-  llmHelpSource: string;
+  llmHelpSource: string; // default to --help
   dev?: boolean;
-  global?: boolean;
 };
 ```
 
@@ -146,7 +145,7 @@ export type LLMCommand = {
 Un agent peut :
 
 * Explorer : `llm-cli list` / `llm-cli search`
-* Comprendre : `llm-cli llm-help "<name>"`
+* Comprendre : `llm-cli help "<name>"`
 * Exécuter : charger `url`, parser `--llm`, exécuter la commande
 
 Les commandes marquées `"dev": true` sont **invisibles** par défaut
@@ -157,8 +156,6 @@ Les commandes marquées `"dev": true` sont **invisibles** par défaut
 ## 🛣️ Roadmap
 
 * [ ] Support des commandes distantes (`url: "https://..."`)
-* [ ] Groupes de commandes par projet
-* [ ] Export / import des index
 * [ ] Tags hiérarchiques
 * [ ] Support du format Markdown dans `--llm-help`
 
@@ -174,7 +171,7 @@ llm-cli validate
 
 Renvoie les erreurs suivantes :
 
-* Fichier absent ou malformé
+* Fichier absent ou malformé ou `commande --help` non reçue.
 * Chemin inexistant
 * Champ manquant (nom, url, etc.)
 * Doublon de nom

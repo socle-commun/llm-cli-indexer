@@ -61,3 +61,13 @@ Feature: Add CLI Command
     When I run "llm-cli add ./path/to/new-script.sh --name existing-command"
     Then an error message "Command with name 'existing-command' already exists." should be displayed
     And the local index should not be modified
+
+  Scenario: Add a new system command
+    Given the llm-cli index is initialized locally
+    And the system command "comet" exists and responds to "analyze --help" with "Analyze project files."
+    When I run "llm-cli add comet --name "comet analyze" -t project -t analyse -t tree -t ast --llm-help "analyze --help""
+    Then the command "comet analyze" should be added to the local index
+    And its command should be "comet"
+    And its llmHelpSource should be "analyze --help"
+    And its description should be "Analyze project files."
+    And its tags should be "project", "analyse", "tree", "ast"
