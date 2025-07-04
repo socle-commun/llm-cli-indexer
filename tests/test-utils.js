@@ -58,7 +58,8 @@ export const createDummyScript = (scriptName, descriptionContent, executable = t
   if (!fs.existsSync(TEMP_SCRIPTS_DIR)) {
     fs.mkdirSync(TEMP_SCRIPTS_DIR, { recursive: true });
   }
-  const scriptPath = path.join(TEMP_SCRIPTS_DIR, `${path.parse(scriptName).name}.js`);
+  // Use the full scriptName to preserve its original extension (e.g., .py, .sh)
+  const scriptPath = path.join(TEMP_SCRIPTS_DIR, scriptName);
   console.log(`DEBUG: createDummyScript - scriptName: ${scriptName}, scriptPath: ${scriptPath}`);
 
   const scriptContent = `#!/usr/bin/env node

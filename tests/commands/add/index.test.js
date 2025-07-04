@@ -94,7 +94,8 @@ describe('llm-cli add command', () => {
   test('should prevent adding command with duplicate name', () => {
     cleanup();
     initCliIndex(false); // Initialize index explicitly for this test
-    const scriptPath = createDummyScript('script1.js', 'Script 1 description.');
+    const script1Path = createDummyScript('script1.js', 'Script 1 description.');
+    // Add the first command successfully.
     execSync(`node src/index.js add ${script1Path} --name duplicate-name`, { stdio: 'pipe', cwd: process.cwd() });
 
     const script2Path = createDummyScript('script2.js', 'Script 2 description.');
