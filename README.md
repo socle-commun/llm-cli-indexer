@@ -17,6 +17,21 @@ llm-cli add -t analyze -t ast "comet analyze"
 
 ## 🧰 Commandes disponibles
 
+### 🏗 `llm-cli init`
+
+Initialise le répertoire `.llm-cli` et son `index.json`.
+
+```bash
+llm-cli init [options]
+```
+
+#### Options
+
+| Flag | Alias | Type | Description |
+| --- | --- | --- | --- |
+| `-g` | `--global` | `boolean` | Initialise dans `~/.llm-cli/` au lieu de `./.llm-cli/` |
+
+
 ### 🔧 `llm-cli add`
 
 Enregistre une commande CLI pour qu’elle soit connue et invocable par l’IA.
@@ -34,6 +49,9 @@ llm-cli add [options] <command-path>
 | `-g`         | `--global` | `boolean`  | Enregistre dans `~/.llm-cli/` au lieu de `./.llm-cli/`         |
 | `--dev`      | –          | `boolean`  | Marque la commande comme disponible uniquement en dev          |
 | `--help`     | –          | `string`   | Commande à exécuter pour générer une doc IA (default: `--help`)|
+| `-d` | `--description` | `string` | Description personnalisée |
+| `-i` | `--install` | `string` | Commande d'installation |
+| `--config` | – | `string` | Fichier JSON de plusieurs commandes |
 
 ---
 
@@ -45,6 +63,12 @@ llm-cli remove [-g] <name>
 
 Supprime une commande enregistrée.
 
+#### Options
+
+| Flag | Alias | Type | Description |
+| --- | --- | --- | --- |
+| `-g` | `--global` | `boolean` | Utilise l'index global `~/.llm-cli/` |
+
 ---
 
 ### 🔁 `llm-cli update`
@@ -54,6 +78,14 @@ llm-cli update [options] <name>
 ```
 
 Modifie un ou plusieurs champs d'une commande enregistrée.
+
+#### Options
+
+| Flag | Alias | Type | Description |
+| --- | --- | --- | --- |
+| `--new-name` | – | `string` | Nouveau nom de la commande |
+| `-t` | `--tag` | `string[]` | Remplace les tags |
+| `-g` | `--global` | `boolean` | Modifie l'index global |
 
 ---
 
@@ -65,6 +97,15 @@ llm-cli [--include-dev] list
 
 Liste les commandes disponibles (hors `dev` par défaut).
 
+#### Options
+
+| Flag | Alias | Type | Description |
+| --- | --- | --- | --- |
+| `-g` | `--global` | `boolean` | Utilise l'index global |
+| `--include-dev` | – | `boolean` | Affiche aussi les commandes de dev |
+| `-t` | `--tag` | `string[]` | Filtre par tag |
+| `--type` | – | `string` | Filtre par extension (js, sh, py) |
+
 ---
 
 ### 🔎 `llm-cli search`
@@ -75,6 +116,14 @@ llm-cli search [--include-dev] <keywords...>
 
 Recherche des commandes enregistrées par nom, description ou tag.
 
+#### Options
+
+| Flag | Alias | Type | Description |
+| --- | --- | --- | --- |
+| `-g` | `--global` | `boolean` | Recherche dans l'index global |
+| `--include-dev` | – | `boolean` | Inclut les commandes de dev |
+| `-t` | `--tag` | `string` | Filtre par tag |
+
 ---
 
 ### ✅ `llm-cli validate`
@@ -84,6 +133,12 @@ llm-cli [-g] validate
 ```
 
 Valide la structure de l’index JSON et la présence réelle des binaires.
+
+#### Options
+
+| Flag | Alias | Type | Description |
+| --- | --- | --- | --- |
+| `-g` | `--global` | `boolean` | Valide l'index global |
 
 ---
 
@@ -145,7 +200,7 @@ export type LLMCommand = {
 Un agent peut :
 
 * Explorer : `llm-cli list` / `llm-cli search`
-* Comprendre : `llm-cli help "<name>"`
+* Comprendre : exécuter la commande avec `--llm-help` pour obtenir sa description
 * Exécuter : charger `url`, parser `--llm`, exécuter la commande
 
 Les commandes marquées `"dev": true` sont **invisibles** par défaut
