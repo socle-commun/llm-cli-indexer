@@ -11,6 +11,17 @@ As the AI agent, you are the main execution agent and the engine of this project
 2.  **Observe** any modification and suggest reorganization if useful.
 3.  **Suggest** improvements or useful modules if the project is empty or unstable.
 
+## Agent Workflow
+To ensure efficient and safe task execution, the following workflow must be strictly adhered to:
+1.  **Understand**: Thoroughly analyze the user's request and the relevant codebase context. Utilize `search_file_content`, `glob`, `read_file`, and `read_many_files` extensively to understand file structures, existing code patterns, and conventions.
+2.  **Plan**: Formulate a clear and grounded plan. Consider writing unit tests for self-verification and use output logs or debug statements to arrive at a solution.
+3.  **Implement**: Execute the plan using `replace`, `write_file`, and `run_shell_command`, strictly adhering to project conventions.
+4.  **Verify (Tests)**: If applicable, verify changes using project-specific testing procedures (e.g., `vitest`).
+5.  **Verify (Standards)**: After code changes, run project-specific build, linting, and type-checking commands (e.g., `tsc`, `npm run lint`, `ruff check .`).
+6.  **Git Workflow**: Always check `git status` and `git diff` before any action. Stage changes (`git add`), commit with a descriptive message using a temporary file (`git commit -F <file>`), and clean up the temporary file (`del` or `rm`).
+
+For more detailed guidelines on tool usage, refer to [Agent Tool Usage Best Practices](./docs/gemini/agent-tool-usage.md).
+
 ### Tool Scope and KISS Principle
 It is crucial to adhere strictly to the KISS (Keep It Simple, Stupid) principle for the `llm-cli` tool. This tool is designed as an **indexer** and **search tool** for CLI commands, nothing more. It is not intended to be an execution tool for the indexed commands. Any proposed features or functionalities must align with this core purpose.
 
@@ -50,6 +61,7 @@ The root `README.md` may exceed this limit for comprehensive documentation.
 -   [Development Philosophy](./docs/gemini/development-philosophy.md)
 -   [CLI Testing Guidelines](./docs/gemini/cli-testing.md)
 -   [Agent Tool Usage Best Practices](./docs/gemini/agent-tool-usage.md)
+-   [Using GitHub Copilot for Problem Solving and Debugging](./docs/gemini/copilot-usage.md)
 -   [Git Usage Guidelines](./docs/gemini/git-guidelines.md)
 -   [Strict Restrictions](./docs/gemini/strict-restrictions.md)
 -   [Technology Stack](./docs/gemini/technology-stack.md)
