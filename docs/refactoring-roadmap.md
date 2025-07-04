@@ -25,8 +25,7 @@ To achieve a consistent and modern JavaScript module system (ES Modules) across 
         *   `src/commands/list/index.js` (Done)
         *   `src/commands/remove/index.js` (Done)
         *   `src/commands/search/index.js` (Done)
-        *   `src/commands/update/index.js` (Done)
-        *   `src/commands/validate/index.js` (Done)
+        
     *   **`src/utils/index.js`**: Ensure all utility functions are exported individually with `export`. (Done)
 
 ### Phase 2: Refactor Tests for Robustness
@@ -45,8 +44,7 @@ To achieve a consistent and modern JavaScript module system (ES Modules) across 
         *   `tests/commands/list.test.js` (To do)
         *   `tests/commands/remove.test.js` (To do)
         *   `tests/commands/search.test.js` (To do)
-        *   `tests/commands/update/index.js` (To do)
-        *   `tests/commands/validate/index.js` (To do)
+        
     *   **Initialisation de l'Index dans les Tests**: For tests requiring an initialized index, import and call `initAction` directly instead of using `execSync('node src/index.js init')`. This will execute initialization within the same test process, avoiding `execSync` and file system state issues.
     *   **Robust Cleanup**: Confirm `cleanup` functions use `fs.rmSync(..., { recursive: true, force: true })` for reliable temporary directory removal. (Already implemented in some tests, needs verification across all).
     *   **Improved Assertions**: For `init` command tests, verify file system existence and content directly rather than relying on exact console output.
