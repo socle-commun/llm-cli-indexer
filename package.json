@@ -15,7 +15,8 @@
     "@vitest/coverage-v8": "^3.2.3",
     "vite": "4.4.9",
     "vitepress": "^1.6.3",
-    "vitest": "^3.2.3"
+    "vitest": "^3.2.3",
+    "@rollup/rollup-linux-x64-gnu": "^4.42.0"
   },
   "template": true,
   "engines": {
