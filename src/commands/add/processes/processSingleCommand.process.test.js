@@ -8,16 +8,18 @@ import { inferTagsFromExtension } from './inferTagsFromExtension.process.js';
 // Mock external dependencies
 
 
-vi.mock('fs', () => ({
-  existsSync: vi.fn(),
-  lstatSync: vi.fn(),
-}));
+vi.mock('fs', () => {
+  const existsSync = vi.fn();
+  const lstatSync = vi.fn();
+  return { existsSync, lstatSync, default: { existsSync, lstatSync } };
+});
 
-vi.mock('path', () => ({
-  resolve: vi.fn(),
-  dirname: vi.fn(),
-  extname: vi.fn(),
-}));
+vi.mock('path', () => {
+  const resolve = vi.fn(p => p);
+  const dirname = vi.fn(p => p.split('/').slice(0, -1).join('/'));
+  const extname = vi.fn();
+  return { resolve, dirname, extname, default: { resolve, dirname, extname } };
+});
 
 vi.mock('./getCommandDescription.process.js', () => ({
   getCommandDescription: vi.fn(),
