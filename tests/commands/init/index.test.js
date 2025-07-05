@@ -1,5 +1,6 @@
 import { describe, test, expect, beforeEach, afterEach } from 'vitest';
 import { execSync } from 'child_process';
+// Intern note: scenarios covered here come from docs/features/init.feature
 import fs from 'fs';
 import path from 'path';
 import os from 'os';

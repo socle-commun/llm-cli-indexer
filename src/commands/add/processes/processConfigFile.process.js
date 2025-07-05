@@ -2,7 +2,10 @@
  * @file processConfigFile.process.js
  * @description This process handles adding multiple commands from a configuration file.
  * @module processes/processConfigFile
- */
+ *
+ * Intern note: this follows docs/features/add-from-config.feature where
+ * a JSON file defines several commands at once.
+*/
 
 import fs from 'fs';
 import { getCommandDescription } from './getCommandDescription.process.js';

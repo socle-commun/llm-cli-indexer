@@ -2,6 +2,7 @@ import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
+// Intern note: helpers here support command tests defined by the feature files
 
 const LLM_CLI_DIR = '.llm-cli';
 const INDEX_FILE = 'index.json';

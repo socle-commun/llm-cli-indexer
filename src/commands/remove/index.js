@@ -3,6 +3,10 @@ import path from 'path';
 import os from 'os';
 import { getIndexPath, readIndex, writeIndex } from '../../utils/index.js';
 
+/**
+ * Intern note: command removal scenarios live in docs/features/remove.feature.
+ */
+
 export const command = (program) => {
   program.command('remove <name>')
     .description('Remove a command from the index')

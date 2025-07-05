@@ -3,6 +3,7 @@ import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import { cleanup, writeIndex, localIndexPath } from '../../test-utils.js';
+// Intern note: scenarios from docs/features/remove.feature
 
 describe('llm-cli remove', () => {
   test('removes an existing local command', () => {

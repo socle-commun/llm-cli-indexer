@@ -2,6 +2,9 @@
  * @file processSingleCommand.process.js
  * @description This process handles adding a single command to the index.
  * @module processes/processSingleCommand
+ *
+ * Intern note: this logic supports the scenarios in
+ * docs/features/add.feature and docs/features/add-auto-infer.feature.
  */
 
 import fs from 'fs';

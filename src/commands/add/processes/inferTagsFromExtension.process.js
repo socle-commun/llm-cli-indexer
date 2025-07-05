@@ -2,7 +2,9 @@
  * @file inferTagsFromExtension.process.js
  * @description This process infers tags for a command based on its file extension.
  * @module processes/inferTagsFromExtension
- */
+ *
+ * Intern note: tag inference is showcased in docs/features/add-auto-infer.feature.
+*/
 
 import path from 'path';
 

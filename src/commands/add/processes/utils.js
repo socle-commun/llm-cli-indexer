@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
+// Intern note: helper functions used by add command processes
 
 export function getCommandDescription(commandToDescribe, llmHelpSource) {
   let commandToExecute;

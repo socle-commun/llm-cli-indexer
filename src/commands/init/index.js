@@ -3,6 +3,11 @@ import path from 'path';
 import os from 'os';
 import { getIndexPath, readIndex, writeIndex } from '../../utils/index.js';
 
+/**
+ * Intern note: initialization scenarios are documented in
+ * docs/features/init.feature.
+ */
+
 const LLM_CLI_DIR = '.llm-cli';
 const INDEX_FILE = 'index.json';
 

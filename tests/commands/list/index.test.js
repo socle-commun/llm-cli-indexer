@@ -1,6 +1,7 @@
 import { describe, test, expect } from 'vitest';
 import { execSync } from 'child_process';
 import { cleanup, writeIndex } from '../../test-utils.js';
+// Intern note: tests mirror docs/features/list.feature
 import path from 'path';
 import os from 'os';
 

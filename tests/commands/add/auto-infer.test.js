@@ -4,6 +4,7 @@ import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import { cleanup, initCliIndex, createDummyScript } from '../../test-utils.js';
+// Intern note: scenarios come from docs/features/add-auto-infer.feature
 
 describe('llm-cli add command with auto-inference', () => {
   const localIndexPath = path.join(process.cwd(), '.llm-cli', 'index.json');

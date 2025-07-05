@@ -2,6 +2,13 @@ import { getIndexPath, readIndex, writeIndex } from '../../utils/index.js';
 import { processConfigFile } from './processes/processConfigFile.process.js';
 import { processSingleCommand } from './processes/processSingleCommand.process.js';
 
+/**
+ * Intern note: `add` command behavior is described in
+ * {@link ../docs/features/add.feature docs/features/add.feature}.
+ * Auto inference and config file support live in
+ * docs/features/add-auto-infer.feature and add-from-config.feature.
+ */
+
 export const command = (program) => {
   program.command('add [command...]')
     .description('Registers a CLI command for AI invocation or adds commands from a config file')

@@ -3,6 +3,10 @@ import path from 'path';
 import os from 'os';
 import { getIndexPath, readIndex, writeIndex } from '../../utils/index.js';
 
+/**
+ * Intern note: search behavior is defined in docs/features/search.feature.
+ */
+
 export const command = (program) => {
   program.command('search <keywords...>')
     .description('Searches registered commands by name, description, or tag')
