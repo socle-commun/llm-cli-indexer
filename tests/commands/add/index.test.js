@@ -74,22 +74,6 @@ describe('llm-cli add command', () => {
     expect(indexContent[0].description).toBe('My custom description.');
   });
 
-  // Scenario: Add a command with an install command
-  test('should add a command with an install command', () => {
-    cleanup();
-    initCliIndex(false);
-    //TODO: Ne pas utiliser de script local ici
-    // Utiliser `npm i -g vitepress` pour tester l'installation
-  });
-
-  // Scenario: Attempt to add a command that does not respond to --help
-  test('should NOT error if command does not respond to help', () => {
-    cleanup();
-    initCliIndex(false); // Initialize index explicitly for this test
-    const scriptPath = createDummyScript('non-responsive-script.js', 'process.exit(1);');
-    // TODO: This should not throw an error, but we need to ensure it does not crash
-  });
-
   // Scenario: Attempt to add a command with a duplicate name
   test('should prevent adding command with duplicate name', () => {
     cleanup();
