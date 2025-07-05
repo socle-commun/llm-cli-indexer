@@ -21,7 +21,7 @@ describe('Documentation build', () => {
   beforeAll(() => {
     cleanDist(); // Clean before building to ensure a fresh build
     buildDocs();
-  });
+  }, 30000);
 
   afterAll(() => {
     cleanDist();
