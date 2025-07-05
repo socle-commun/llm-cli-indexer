@@ -2,6 +2,15 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { execSync } from 'child_process';
 import { existsSync, readFileSync, rmSync } from 'fs';
 
+/**
+ * Simple integration test for the documentation build process.
+ * It runs `npm run docs:build` (see `docs/vitepress.md`) so that the
+ * static site is generated before assertions run.
+ *
+ * The README details all CLI commands provided by this project. When new
+ * features are added there, the test ensures the site still compiles.
+ */
+
 const buildDocs = () => {
   execSync('npm run docs:build', { stdio: 'inherit' });
 };
