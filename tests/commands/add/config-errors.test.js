@@ -3,6 +3,7 @@ import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import { cleanup, initCliIndex, createDummyScript } from '../../test-utils.js';
+// Intern note: error cases complement docs/features/add-from-config.feature
 
 describe('llm-cli add command from configuration file errors', () => {
   const configFilePath = path.join(process.cwd(), 'commands.json');

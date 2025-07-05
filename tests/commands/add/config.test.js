@@ -4,6 +4,7 @@ import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import { cleanup, initCliIndex, createDummyScript } from '../../test-utils.js';
+// Intern note: scenarios from docs/features/add-from-config.feature
 
 describe('llm-cli add command from configuration file', () => {
   const localIndexPath = path.join(process.cwd(), '.llm-cli', 'index.json');

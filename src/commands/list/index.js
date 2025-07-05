@@ -3,6 +3,11 @@ import path from 'path';
 import os from 'os';
 import { getIndexPath, readIndex, writeIndex } from '../../utils/index.js';
 
+/**
+ * Intern note: listing behavior is defined in
+ * docs/features/list.feature and docs/features/list-filtering.feature.
+ */
+
 export const command = (program) => {
   program.command('list')
     .description('List commands in the llm-cli index')

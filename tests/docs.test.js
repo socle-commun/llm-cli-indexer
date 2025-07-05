@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { execSync } from 'child_process';
+// Intern note: ensures documentation build works as described in docs/roadmap.md
 import { existsSync, readFileSync, rmSync } from 'fs';
 
 const buildDocs = () => {

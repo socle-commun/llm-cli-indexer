@@ -1,6 +1,7 @@
 import { describe, test, expect } from 'vitest';
 import { execSync } from 'child_process';
 import { cleanup, writeIndex } from '../../test-utils.js';
+// Intern note: these tests exercise docs/features/search.feature
 import path from 'path';
 
 const localDir = path.join(process.cwd(), '.llm-cli');

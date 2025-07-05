@@ -2,6 +2,11 @@
 
 import { Command } from 'commander';
 
+/**
+ * Intern tip: this file wires all CLI commands together.
+ * The scenarios for each command live under docs/features/.
+ */
+
 const program = new Command();
 
 program

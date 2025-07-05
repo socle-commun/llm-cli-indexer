@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 import { cleanup, initCliIndex, createDummyScript, escapeRegExp } from '../../test-utils.js';
+// Intern note: this test suite validates docs/features/add.feature
 
 describe('llm-cli add command', () => {
   const localLlmCliDir = path.join(process.cwd(), '.llm-cli');

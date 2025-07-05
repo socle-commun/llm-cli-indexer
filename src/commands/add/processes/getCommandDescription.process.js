@@ -3,6 +3,9 @@
  * @description This process infers the description of a command by executing it with a specified help source.
  * It handles both file-based scripts and system commands.
  * @module processes/getCommandDescription
+ *
+ * Intern note: used when the add command needs to infer a description.
+ * See docs/features/add-auto-infer.feature for the expected behavior.
  */
 
 import fs from 'fs';
